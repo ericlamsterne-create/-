@@ -1,28 +1,34 @@
 import React, { useState } from 'react';
 import { generateMemeConcept, generateVisual } from '../services/geminiService';
-import { MemeContent } from '../types';
+import { MemeContent, IeltsWord } from '../types';
+import WordCard from './WordCard';
+import { speak } from '../utils/speech';
 
-const FunMode: React.FC = () => {
+interface FunModeProps {
+  favorites: IeltsWord[];
+  onToggleFavorite: (word: IeltsWord) => void;
+}
+
+const FunMode: React.FC<FunModeProps> = ({ favorites, onToggleFavorite }) => {
   const [meme, setMeme] = useState<MemeContent | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [showCard, setShowCard] = useState(false);
+
+  // Check favorite status
+  const isFav = meme ? favorites.some(f => f.word === meme.word) : false;
 
   const handleGenerate = async () => {
     setLoading(true);
-    setShowDetails(false);
     setMeme(null);
     setImageUrl(null);
+    setShowCard(false);
 
     try {
-      // 1. Get Text Concept
       const memeData = await generateMemeConcept();
       setMeme(memeData);
-
-      // 2. Generate Visual
-      const url = await generateVisual(memeData.visualPrompt + ", funny, meme style, cartoon, expressive");
+      const url = await generateVisual(memeData.visualPrompt + ", funny, vibrant colors, pop art style, digital art, high contrast");
       setImageUrl(url);
-
     } catch (e) {
       console.error(e);
     } finally {
@@ -31,80 +37,107 @@ const FunMode: React.FC = () => {
   };
 
   return (
-    <div className="h-full w-full overflow-y-auto bg-morandi-bg p-6 flex flex-col items-center">
-      <header className="w-full mb-8">
-        <h1 className="text-3xl font-bold text-morandi-charcoal mb-2">Fun Learning</h1>
-        <p className="text-morandi-sage">Memes, cats, and reddit humor.</p>
+    <div className="h-full w-full overflow-y-auto p-6 flex flex-col items-center relative z-10">
+      
+      <header className="w-full mb-6 z-10 flex flex-col items-center">
+        <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-midnight-accent to-purple-400 drop-shadow-sm mb-2">
+          MEME GEN
+        </h1>
+        <div className="h-1 w-20 bg-midnight-accent rounded-full"></div>
       </header>
 
-      {/* Main Content Area */}
-      <div className="w-full max-w-md flex-1 flex flex-col items-center justify-center min-h-[400px]">
+      <div className="w-full max-w-md flex-1 flex flex-col items-center z-10 pb-24">
         {!meme && !loading && (
-          <div className="text-center p-8 bg-white/50 rounded-2xl border-2 border-dashed border-morandi-stone">
-            <span className="text-6xl mb-4 block">😹</span>
-            <p className="text-lg text-morandi-charcoal mb-6">Ready for a laugh?</p>
+          <div className="mt-10 text-center p-10 glass-panel rounded-3xl border-dashed border-2 border-midnight-border/50 flex flex-col items-center gap-6 transform hover:scale-105 transition-transform duration-300">
+            <div className="text-7xl animate-bounce">👾</div>
+            <p className="text-midnight-muted">Ready to learn with humor?</p>
             <button 
               onClick={handleGenerate}
-              className="px-8 py-3 bg-morandi-clay text-white rounded-full font-bold shadow-lg hover:bg-morandi-sage transition-all"
+              className="px-10 py-4 bg-gradient-to-r from-midnight-accent to-blue-600 text-white rounded-full font-bold shadow-[0_0_20px_rgba(56,189,248,0.4)] active:scale-95 transition-all"
             >
-              Generate Meme
+              GENERATE MEME
             </button>
           </div>
         )}
 
         {loading && (
-          <div className="flex flex-col items-center">
-            <div className="w-64 h-64 bg-morandi-stone/20 rounded-xl animate-pulse flex items-center justify-center">
-               <span className="text-4xl animate-bounce">🤔</span>
+          <div className="flex flex-col items-center justify-center mt-20">
+            <div className="relative w-32 h-32">
+              <div className="absolute inset-0 rounded-full border-4 border-midnight-card"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-midnight-accent border-r-transparent animate-spin"></div>
+              <div className="absolute inset-4 rounded-full bg-midnight-card/50 backdrop-blur-sm flex items-center justify-center text-3xl">🤔</div>
             </div>
-            <p className="mt-4 text-morandi-sage font-medium">Cooking up a joke...</p>
+            <p className="mt-6 text-midnight-accent font-mono animate-pulse tracking-widest">COOKING MEME...</p>
           </div>
         )}
 
         {meme && imageUrl && (
-          <div className="w-full perspective-1000">
-             {/* Meme Card */}
-             <div 
-               className="relative bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition-transform hover:scale-[1.02]"
-               onClick={() => setShowDetails(!showDetails)}
-             >
-                <div className="relative aspect-square w-full bg-gray-100">
-                  <img src={imageUrl} alt="Meme" className="w-full h-full object-cover" />
+          <div className="w-full animate-fade-in-up">
+             {/* Holographic Card Container */}
+             <div className="relative bg-gray-900 rounded-2xl shadow-2xl overflow-hidden border border-midnight-border group transition-all duration-500 hover:shadow-[0_0_30px_rgba(56,189,248,0.3)]">
+                
+                {/* Image Area */}
+                <div className="relative aspect-square w-full bg-black">
+                  <img src={imageUrl} alt="Meme" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
                   
-                  {/* Text Overlay - Meme Style */}
-                  <div className="absolute top-4 left-0 w-full text-center px-4">
-                     <span className="text-white font-black text-2xl uppercase tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" style={{ textShadow: '2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}>
+                  {/* Word Overlay */}
+                  <div className="absolute top-4 left-0 w-full text-center px-4 z-20">
+                     <span 
+                       onClick={(e) => { e.stopPropagation(); setShowCard(!showCard); }}
+                       className="text-white font-black text-4xl uppercase tracking-tighter drop-shadow-[0_4px_4px_rgba(0,0,0,1)] cursor-pointer hover:text-midnight-accent transition-colors"
+                       style={{ textShadow: '0 0 20px rgba(0,0,0,0.8), 2px 2px 0px #000' }}
+                     >
                         {meme.word}
                      </span>
                   </div>
-                  <div className="absolute bottom-6 left-0 w-full text-center px-4">
-                     <span className="text-white font-bold text-lg leading-tight drop-shadow-md bg-black/50 px-2 py-1 rounded box-decoration-clone">
-                        {meme.caption}
+
+                  {/* Caption Overlay - Click to Speak */}
+                  <div 
+                    onClick={() => speak(meme.caption)}
+                    className="absolute bottom-6 left-0 w-full text-center px-4 z-20 cursor-pointer transition-transform active:scale-95"
+                  >
+                     <span className="inline-block text-white font-bold text-xl leading-tight bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/10 shadow-xl hover:bg-black/80 hover:border-midnight-accent/50 transition-all">
+                        {meme.caption} 🔊
                      </span>
                   </div>
                 </div>
-
-                {/* Details Fold-out */}
-                {showDetails && (
-                  <div className="p-6 bg-morandi-stone/10 border-t border-morandi-stone/20 animate-fade-in">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-bold text-morandi-charcoal">{meme.word}</h3>
-                      <button className="text-xs bg-morandi-blue text-white px-2 py-1 rounded">Audio 🔊</button>
-                    </div>
-                    <p className="text-morandi-charcoal mb-2 font-medium">Why is this funny?</p>
-                    <p className="text-sm text-gray-600 italic">{meme.context}</p>
-                  </div>
-                )}
+                
+                {/* Context Footer */}
+                <div className="p-5 bg-gradient-to-b from-gray-900 to-gray-950 border-t border-white/5">
+                   <p className="text-gray-400 text-sm italic border-l-2 border-midnight-accent pl-3">
+                     "{meme.context}"
+                   </p>
+                </div>
              </div>
 
-             <div className="mt-6 flex justify-center gap-4">
+             {/* Action Buttons */}
+             <div className="flex gap-3 mt-6">
+                <button 
+                  onClick={() => setShowCard(!showCard)}
+                  className={`flex-1 py-3 rounded-xl font-bold border border-midnight-border transition-colors ${showCard ? 'bg-midnight-accent text-black' : 'bg-midnight-card text-white hover:bg-white/5'}`}
+                >
+                  {showCard ? 'HIDE DETAILS' : 'WHAT DOES IT MEAN?'}
+                </button>
                 <button 
                   onClick={handleGenerate}
-                  className="px-6 py-3 bg-morandi-sage text-white rounded-xl shadow-md font-medium"
+                  className="px-6 py-3 bg-midnight-surface text-white rounded-xl border border-midnight-border hover:bg-midnight-card text-2xl"
+                  title="Next Meme"
                 >
-                  Next Meme ➡️
+                  ➡️
                 </button>
              </div>
+
+             {/* Popup Detail Card */}
+             {showCard && (
+               <div className="mt-6 animate-fade-in-up">
+                 <WordCard 
+                    data={meme} 
+                    isFavorite={isFav} 
+                    onToggleFavorite={onToggleFavorite} 
+                    autoPlay={false} // Don't auto-play here since user likely clicked caption already
+                 />
+               </div>
+             )}
           </div>
         )}
       </div>

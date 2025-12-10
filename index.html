@@ -3,43 +3,100 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IELTS Lens - Visual Learning</title>
+    <title>IELTS Lens - Cyber Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              morandi: {
-                bg: '#F2F1EB',      // Warm Off-white
-                sage: '#8FA69D',    // Muted Green
-                clay: '#D0A99D',    // Muted Terra-cotta
-                blue: '#AEC2C6',    // Dusty Blue
-                charcoal: '#525252', // Soft Black
-                stone: '#C5C1B9',   // Warm Grey
+              midnight: {
+                bg: '#05070A',       // Deepest Black-Blue
+                card: '#111827',     // Dark Gray Blue
+                surface: '#1F2937',  
+                text: '#F3F4F6',     
+                muted: '#9CA3AF',    
+                accent: '#38BDF8',   // Electric Blue
+                secondary: '#818CF8', // Electric Indigo
+                success: '#34D399',  
+                border: 'rgba(56, 189, 248, 0.2)', // Subtle blue border
               }
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            animation: {
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 3s ease-in-out infinite',
+              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+              'grid-flow': 'gridFlow 20s linear infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              gridFlow: {
+                '0%': { backgroundPosition: '0 0' },
+                '100%': { backgroundPosition: '0 50px' }
+              }
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #F2F1EB;
-        color: #525252;
+        background-color: #05070A;
+        color: #F3F4F6;
+        overflow: hidden; /* App handles scroll */
       }
-      /* Hide scrollbar for clean UI */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
+      
+      /* Cyber Grid Background */
+      .bg-cyber-grid {
+        background-color: #05070A;
+        background-image: 
+          linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+        background-size: 50px 50px;
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        animation: gridFlow 20s linear infinite;
+        pointer-events: none;
       }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+      
+      .bg-cyber-grid::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, transparent 0%, #05070A 90%);
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(56, 189, 248, 0.3); 
+        border-radius: 4px;
+      }
+      
+      .glass-panel {
+        background: rgba(17, 24, 39, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
     </style>
   <script type="importmap">

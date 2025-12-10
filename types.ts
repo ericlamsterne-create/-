@@ -1,33 +1,32 @@
 export interface IeltsWord {
   word: string;
   pronunciation: string;
-  meaning: string; // Chinese meaning
-  sentence: string; // Simple 1st person sentence
-  translation: string; // Sentence translation
+  meaning: string; 
+  sentence: string; 
+  translation: string;
+  timestamp?: number; // For favorites sorting
 }
 
-export interface MemeContent {
-  word: string;
-  caption: string; // The text on the meme
-  context: string; // Explanation of the joke
-  visualPrompt: string; // Prompt to generate the image
+// Extends IeltsWord so we can easily save it or view it
+export interface MemeContent extends IeltsWord {
+  caption: string; 
+  context: string; 
+  visualPrompt: string; 
 }
 
+// Extends IeltsWord for the vocabulary found in the panel
 export interface ComicPanel {
   panelNumber: number;
   description: string;
   dialogue: string;
-  relatedWord: string;
   visualPrompt: string;
+  
+  // The vocabulary word details for this panel
+  wordData: IeltsWord;
 }
 
 export enum AppMode {
   CAMERA = 'camera',
   FUN = 'fun',
   COMIC = 'comic'
-}
-
-export interface GeneratedImage {
-  url: string;
-  alt: string;
 }
