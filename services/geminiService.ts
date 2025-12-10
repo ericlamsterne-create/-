@@ -48,6 +48,17 @@ const comicSchema: Schema = {
   },
 };
 
+// Helper to clean Markdown JSON code blocks
+const cleanJson = (text: string): string => {
+  if (!text) return "{}";
+  let cleaned = text.trim();
+  // Remove markdown code blocks if present
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```(json)?/, "").replace(/```$/, "");
+  }
+  return cleaned;
+};
+
 export const analyzeImageForWord = async (base64Image: string): Promise<IeltsWord> => {
   const model = "gemini-2.5-flash";
   const response = await ai.models.generateContent({
@@ -64,7 +75,7 @@ export const analyzeImageForWord = async (base64Image: string): Promise<IeltsWor
       systemInstruction: "You are an IELTS tutor. Return strict JSON."
     }
   });
-  return JSON.parse(response.text || "{}") as IeltsWord;
+  return JSON.parse(cleanJson(response.text)) as IeltsWord;
 };
 
 export const generateMemeConcept = async (topic?: string): Promise<MemeContent> => {
@@ -81,7 +92,7 @@ export const generateMemeConcept = async (topic?: string): Promise<MemeContent> 
       systemInstruction: "Creative meme generator. Include full word definition details."
     }
   });
-  return JSON.parse(response.text || "{}") as MemeContent;
+  return JSON.parse(cleanJson(response.text)) as MemeContent;
 };
 
 export const generateComicScript = async (theme: string): Promise<ComicPanel[]> => {
@@ -94,7 +105,7 @@ export const generateComicScript = async (theme: string): Promise<ComicPanel[]> 
       systemInstruction: "Comic writer. Include full word data for the key vocabulary in each panel."
     }
   });
-  return JSON.parse(response.text || "[]") as ComicPanel[];
+  return JSON.parse(cleanJson(response.text)) as ComicPanel[];
 };
 
 export const generateVisual = async (prompt: string): Promise<string> => {
