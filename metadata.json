@@ -1,0 +1,7 @@
+{
+  "name": "Copy of IELTS Lens",
+  "description": "A visual, interactive IELTS vocabulary learner using AI for object recognition, memes, and comics.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
